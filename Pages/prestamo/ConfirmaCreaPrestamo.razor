@@ -1,0 +1,43 @@
+﻿
+@using PrestaFacil.Services;
+@inject NavigationManager navigationManager
+@inject IClienteService clienteServicio
+@inject IJSRuntime jsRuntime
+
+
+    <div class="modal fade" style="width:30% !important; margin-left:45% !important; margin-top:50px !important;" tabindex="-1" role="dialog" id="dlgConfirmacion">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmation Creación de Préstamo</h5>
+                    <button type="button" @onclick="OnModalClose" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Esta seguro que desea crear este préstamo?</p>
+                <p>Al cliente <span style="color:blue !important; font-weight:bold !important;">@nombre_cliente</span> ?</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="CrearPrestamo">Crear</button>
+                <button type="button" class="btn btn-secondary" @onclick="OnModalClose" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+@code {
+
+    [Parameter] public Action DataChanged { get; set; }
+    [Parameter] public EventCallback CrearPrestamo { get; set; }
+    [Parameter] public string nombre_cliente { get; set; }
+
+    private async void OnModalClose()
+    {
+        navigationManager.NavigateTo("/calculoprestamo");
+        await jsRuntime.InvokeAsync<object>("CloseModal", "dlgConfirmacion");
+        
+    }
+}

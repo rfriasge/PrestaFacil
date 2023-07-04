@@ -149,10 +149,10 @@
 
       var transitionDuration = $__default['default'](element).css('transition-duration');
       var transitionDelay = $__default['default'](element).css('transition-delay');
-      var floatTransitionDuration = parseFloat(transitionDuration);
-      var floatTransitionDelay = parseFloat(transitionDelay); // Return 0 if element or transition duration is not found
+      var doubleTransitionDuration = parseFloat(transitionDuration);
+      var doubleTransitionDelay = parseFloat(transitionDelay); // Return 0 if element or transition duration is not found
 
-      if (!floatTransitionDuration && !floatTransitionDelay) {
+      if (!doubleTransitionDuration && !doubleTransitionDelay) {
         return 0;
       } // If multiple durations are defined, take the first
 

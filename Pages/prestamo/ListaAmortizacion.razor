@@ -1,0 +1,30 @@
+﻿<div class="form-group mt-1">
+
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="12"
+                AllowSorting="true" Data="@lstAmortizacion" TItem="TablaAmortizacion" ColumnWidth="150px" class="table table-bordered table-striped table-hover table-sm">
+        <Columns>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="NoCuota" Title="No.Cuota" Width="5%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="MontoCuota" Title="Monto Cuota" FormatString="{0:N2}" Width="10%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="CapitalCuota" Title="Capital Cuota" FormatString="{0:N2}" Width="10%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="InteresCuota" Title="Interes Cuota" FormatString="{0:N2}"  Width="10%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="FechaCuota" Title="Fecha Cuota" FormatString="{0:dd/MM/yyyy}" Width="10%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="CapitalPendiente" Title="Capital Pendiente" FormatString="{0:N2}"  Width="10%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="CapitalAcumulado" Title="Capital Acumulado" FormatString="{0:N2}"  Width="10%"></RadzenGridColumn>
+            <RadzenGridColumn TItem="TablaAmortizacion" Property="InteresAcumulado" Title="Interes Acumulado" FormatString="{0:N2}"  Width="10%"></RadzenGridColumn>
+
+        </Columns>
+    </RadzenGrid>
+
+
+</div>
+
+@code {
+    [Parameter] public List<TablaAmortizacion> lstAmortizacion { get; set; }
+    [Parameter] public Action DataChanged { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        DataChanged?.Invoke();
+        return base.OnInitializedAsync();
+    }
+}

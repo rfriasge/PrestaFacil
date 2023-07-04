@@ -1,0 +1,142 @@
+﻿@using PrestaFacil.Services;
+@inject ICompaniaService companiaService
+@inject IJSRuntime jsRuntime
+@inject NavigationManager navigationManager
+
+<!-- Modal -->
+<div class="modal fade" id="dlgCompania" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+     style="margin-left:9% !important;">
+    <div class="modal-dialog" role="document" style="width:50% !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@titulo_pantalla</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+
+                <EditForm Model="compania" OnValidSubmit="HandleValidSubmit" class="row g-3">
+                        <DataAnnotationsValidator />
+                        <div class="col-md-6 ">
+                            <label style="padding:0 !important;">Nombre Compañia:</label>
+                            <InputText class="form-control" @bind-Value="@compania.Nombre" />
+                            <ValidationMessage For="(()=> compania.Nombre)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>RNC:</label>
+                            <InputText class="form-control" @bind-Value="@compania.Rnc" />
+                            <ValidationMessage For="(()=> compania.Rnc)" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Email:</label>
+                            <InputText class="form-control" @bind-Value="@compania.Email" />
+                            <ValidationMessage For="(()=> compania.Email)" />
+                        </div>
+
+                        <div class="col-md-12 mt-2">
+                            <label>Dirección:</label>
+                            <InputTextArea class="form-control" @bind-Value="@compania.Direccion" />
+                            <ValidationMessage For="(()=> compania.Direccion)" />
+                        </div>
+
+                        <div class="col-md-3 mt-2">
+                            <label>Teléfono 1:</label>
+                            @*<InputText id="telefono" class="form-control tel" @bind-Value="@compania.Telefono1" />*@
+                        <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" class="form-control" @bind-Value="@compania.Telefono1" />
+                            <ValidationMessage For="(()=> compania.Telefono1)" />
+                        </div>
+                        <div class="col-md-3 mt-2">
+                            <label>Teléfono 2:</label>
+                            @*<InputText class="form-control" @bind-Value="@compania.Telefono2" />*@
+                            <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" class="form-control" @bind-Value="@compania.Telefono2" />
+                            <ValidationMessage For="(()=> compania.Telefono2)" />
+                        </div>
+                    <div class="col-md-3 mt-2">
+                        <label>Contacto:</label>
+                        <InputText class="form-control" @bind-Value="@compania.Contacto" />
+                        <ValidationMessage For="(()=> compania.Contacto)" />
+                    </div>
+                    <div class="col-md-3 mt-2">
+                        <label>Tel Contacto:</label>
+                        <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" class="form-control" @bind-Value="@compania.Telefono_Contacto" />
+                        @*<InputText class="form-control" @bind-Value="@compania.Telefono_Contacto" />*@
+                        <ValidationMessage For="(()=> compania.Telefono_Contacto)" />
+                    </div>
+                    
+
+                        <hr/>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Grabar</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@CloseTaskModal">Close</button>
+                        </div>
+                    </EditForm>
+                
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public int Id { get; set; }
+
+    [Parameter] 
+    public Compania compania { get; set; }
+
+
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public string TituloPantalla { get; set; }
+    [Parameter] public Action DataChanged { get; set; }
+
+
+    private string titulo_pantalla = "";
+    private string clase = "show";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (compania.Id == 0)
+        {
+
+            compania = new Compania();
+            titulo_pantalla = "Crear Compañia";
+        }
+        else
+        {
+            titulo_pantalla = "Editar Compañia";
+        }
+    }
+    private async void HandleValidSubmit()
+    {
+        if (compania.Id == 0)
+        {
+            compania.feccre = DateTime.Now;
+            compania.fecmod = DateTime.Now;
+            await companiaService.Add(compania);
+        }
+        else
+        {
+            await companiaService.Update(compania);
+        }
+        await CloseTaskModal();
+        navigationManager.NavigateTo("/companias",true);
+        
+        //DataChanged?.Invoke();
+    }
+     private async Task CloseTaskModal()
+    {
+        navigationManager.NavigateTo("/companias",true);
+        await jsRuntime.InvokeAsync<object>("CloseModal", "dlgCompania");
+        DataChanged?.Invoke();
+    }
+
+ 
+  
+}

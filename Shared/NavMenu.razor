@@ -1,4 +1,4 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿<div class="top-row pl-4 navbar navbar-dark" >
     <a class="navbar-brand" href="">PrestaFacil</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -8,30 +8,97 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Menu Principal
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="" @onclick="()=> expandSubMenu1 =  !expandSubMenu1">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Configuración
             </NavLink>
+            @if (expandSubMenu1)
+            {
+
+
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="/companias">
+                            <span class="oi oi-file ml-1" aria-hidden="true"></span> Compañia 
+                        </NavLink>
+                    </li>
+            
+  
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="/clientes">
+                            <span class="oi oi-file ml-1" aria-hidden="true"></span> Cliente 
+                        </NavLink>
+                    </li>
+                    
+                    <li class="nav-item px-3">
+                <NavLink class="nav-link" href="">
+                            <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Tipo Préstamo
+                        </NavLink>
+                    </li>
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="">
+                            <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Tipo Transacción
+                        </NavLink>
+                    </li>
+            }
+            </li>
+  
+        <li class="nav-item px-3">
+            <NavLink class="nav-link px-3" href="" @onclick="()=> expandSubMenu2 =  !expandSubMenu2">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Procesos
+            </NavLink>
+            @if (expandSubMenu2)
+            {
+                <li class="nav-item px-3">
+                <NavLink class="nav-link" href="/calculoprestamo">
+                        <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Préstamos
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="/cobros">
+                        <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Cobros
+                    </NavLink>
+                </li>
+            }
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="" @onclick="()=> expandSubMenu3 =  !expandSubMenu3">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Reportes
             </NavLink>
+            @if (expandSubMenu3)
+            {
+                <li class="nav-item px-3">
+                <NavLink class="nav-link" href="">
+                    <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Repore de Préstamos
+                </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="">
+                        <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Imp. Recibo Pago
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="">
+                        <span class="oi oi-bar-chart ml-1" aria-hidden="true"></span> Reporte de Cobros
+                    </NavLink>
+                 </li>
+            }
         </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="todolist">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> ToDo App
-            </NavLink>
-        </li>
+
+        
+        
     </ul>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
+    private bool expandSubMenu1;
+    private bool expandSubMenu2;
+    private bool expandSubMenu3;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

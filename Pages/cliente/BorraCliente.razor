@@ -1,0 +1,47 @@
+﻿
+@using PrestaFacil.Services;
+@inject NavigationManager navigationManager
+@inject IClienteService clienteServicio
+@inject IJSRuntime jsRuntime
+
+
+    <div class="modal fade" style="width:30% !important; margin-left:45% !important; " tabindex="-1" role="dialog" id="dlgBorrar">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmation</h5>
+                    <button type="button" @onclick="OnModalClose" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Esta seguro que desea borrar este registro ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="Delete">Borrar</button>
+                <button type="button" class="btn btn-secondary" @onclick="OnModalClose" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+@code {
+    [Parameter] public int CiaId { get; set; }
+    [Parameter] public Cliente cliente { get; set; }
+    [Parameter] public Action DataChanged { get; set; }
+
+    private async Task Delete()
+    {
+        var cia = await clienteServicio.Delete(CiaId);
+        OnModalClose();
+    }
+
+    private async void OnModalClose()
+    {
+        navigationManager.NavigateTo("/clientes",true);
+        await jsRuntime.InvokeAsync<object>("CloseModal", "dlgBorrar");
+        DataChanged?.Invoke();
+    }
+}

@@ -1,0 +1,169 @@
+﻿@page "/calculoprestamo"
+@using PrestaFacil.Services;
+@using System.ComponentModel.DataAnnotations;
+
+
+@inject NavigationManager navigationManager
+@inject IAmortizacion amortizacionService
+@inject IClienteService clienteService
+
+
+<div class="card">
+    <div class="card-header">
+        Cálculo de Préstamos
+    </div>
+
+    <div class="card-body">
+
+        <EditForm Model=@CalPre OnValidSubmit="HandleValidSubmit" id="FormCalculo">
+            <DataAnnotationsValidator />
+            <div class="row ml-3" style="width:98% !important; ">
+
+                <div class="col-md-2">
+                    <label style="padding:0 !important;">Monto Préstamo:</label>
+                    <RadzenNumeric TValue="double" name="montoPrestamo" title="Prestamo" Format="c" @bind-Value=@CalPre.MontoPrestamo />
+                    <ValidationMessage For="(()=> CalPre.MontoPrestamo)" />
+                </div>
+
+                <div class="col-md-2">
+                    <label style="padding:0 !important;">Cantidad Meses:</label>
+                    <RadzenNumeric TValue="int" name="CantidadMeses" title="Prestamo" @bind-Value=@CalPre.CantidadMeses />
+                    <ValidationMessage For="(()=> CalPre.CantidadMeses)" />
+                </div>
+
+                <div class="col-md-2">
+                    <label style="padding:0 !important;">Tasa:</label> <br/>
+                    <RadzenNumeric TValue="double" name="Tasa" title="Prestamo" @bind-Value=@CalPre.Tasa />
+                    <ValidationMessage For="(()=> CalPre.Tasa)" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary" style="margin-top:33px !important;">Calcular Amortización</button>
+                </div>
+                <div class="col-md-4">
+                    @if (lstAmortizacion.Count != 0)
+                    {
+                        <button type="button" style="double:right !important; margin-top:33px !important;" data-toggle="modal" data-target="#dlgCrearPrestamo"  class="btn btn-primary "
+                            @onclick="@(()=> prepararCrearPrestamo(@CalPre))">
+                            Crear Préstamo
+                        </button>
+                    }
+                </div>
+            </div>
+
+        </EditForm>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header" style="height:50px !important;">
+        <p style="text-align:center; font-size:25px;">Tabla de Amortizacion</p>
+    </div>
+</div>
+
+@if (lstCliente == null)
+{
+    <p>No existen registros</p>
+}
+else
+{
+    <ListaAmortizacion lstAmortizacion=@lstAmortizacion />
+}
+
+
+<CrearPrestamo CalPrev="CalPrev" Cuota="CuotaPrestamo" lstAmortizacion=@lstAmortizacion lstCliente="lstCliente" />
+
+
+@code {
+    CalculoPrestamoView CalPre = new CalculoPrestamoView();
+    CalculoPrestamoPrev CalPrev = new CalculoPrestamoPrev();
+    private List<Cliente> lstCliente = new List<Cliente>();
+    private List<TablaAmortizacion> lstAmortizacion = new List<TablaAmortizacion>();
+
+    double CuotaPrestamo = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+
+        //var lst = amortizacionService.GetAllAmortizacion();
+        lstCliente = clienteService.GetAllEsp();
+
+        return base.OnInitializedAsync();
+    }
+
+    private void prepararCrearPrestamo(CalculoPrestamoView CalPre)
+    {
+        CalPrev.MontoPrestamo = CalPre.MontoPrestamo;
+        CalPrev.CantidadMeses = CalPre.CantidadMeses;
+        CalPrev.Tasa = CalPre.Tasa;
+
+        if (lstAmortizacion.Count != 0)
+        {
+            CalPrev.MontoCuota = double.Parse(lstAmortizacion[0].MontoCuota.ToString());
+        }
+
+    }
+
+    private async void HandleValidSubmit()
+    {
+        CalcularPrestamo(CalPre.MontoPrestamo, CalPre.Tasa, CalPre.CantidadMeses);
+        //lstAmortizacion = await amortizacionService.GetAllAmortizacion();
+    }
+
+
+    private async void CalcularPrestamo(double pmontoPrestamo, double ptasa, int pcantidadMeses)
+    {
+
+        double strMonto = pmontoPrestamo;
+        int meses = pcantidadMeses;
+        double InteresAnual = ptasa;
+        InteresAnual = InteresAnual / 100 / 12;
+        DateTime vfecha = DateTime.Now.AddDays(1);
+
+        double resultado = (1 - Math.Pow(1 + InteresAnual, meses * -1)) / InteresAnual;
+
+        double cuota = strMonto / resultado;
+        double interes = 0;
+        double tinteres = 0;
+        double capital = 0;
+        double tamortizado = 0;
+        double tcuota = 0;
+        double saldoInicial = 0;
+        double acumulado = 0;
+        double saldoFinal = strMonto;
+        int NumCuota = 0;
+        DateTime fechaCuota = DateTime.Now.AddDays(1);
+
+        //await amortizacionService.DeleteAll();
+        lstAmortizacion = new List<TablaAmortizacion>();
+        for (int i = 1; i <= meses; i++)
+        {
+            NumCuota = i;
+            interes = Math.Round(saldoFinal * InteresAnual, 2); // Interes aplica mes
+            tinteres += interes; // Interes acumulado
+            acumulado += interes;
+            saldoInicial = saldoFinal;
+            capital = Math.Round(cuota - interes, 2);
+            tamortizado += capital;
+            saldoFinal -= capital;
+            tcuota += cuota;
+            fechaCuota = fechaCuota.AddMonths(1);
+            TablaAmortizacion ta = new TablaAmortizacion();
+            ta.NoCuota = i;
+            ta.FechaCuota = fechaCuota;
+            ta.MontoCuota = cuota;
+            ta.CapitalCuota = capital;
+            ta.InteresCuota = interes;
+            ta.CapitalAcumulado = tamortizado;
+            ta.CapitalPendiente = strMonto - ta.CapitalAcumulado;
+            ta.InteresAcumulado = tinteres;
+            //await amortizacionService.Add(ta);
+            lstAmortizacion.Add(ta);
+        }
+        
+
+
+    }
+
+
+
+
+}

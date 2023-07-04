@@ -38,7 +38,7 @@
     <Content Include="lib\bootstrap\scss\mixins\_caret.scss" />
     <Content Include="lib\bootstrap\scss\mixins\_clearfix.scss" />
     <Content Include="lib\bootstrap\scss\mixins\_deprecate.scss" />
-    <Content Include="lib\bootstrap\scss\mixins\_float.scss" />
+    <Content Include="lib\bootstrap\scss\mixins\_double.scss" />
     <Content Include="lib\bootstrap\scss\mixins\_forms.scss" />
     <Content Include="lib\bootstrap\scss\mixins\_gradients.scss" />
     <Content Include="lib\bootstrap\scss\mixins\_grid-framework.scss" />
@@ -66,7 +66,7 @@
     <Content Include="lib\bootstrap\scss\utilities\_display.scss" />
     <Content Include="lib\bootstrap\scss\utilities\_embed.scss" />
     <Content Include="lib\bootstrap\scss\utilities\_flex.scss" />
-    <Content Include="lib\bootstrap\scss\utilities\_float.scss" />
+    <Content Include="lib\bootstrap\scss\utilities\_double.scss" />
     <Content Include="lib\bootstrap\scss\utilities\_interactions.scss" />
     <Content Include="lib\bootstrap\scss\utilities\_overflow.scss" />
     <Content Include="lib\bootstrap\scss\utilities\_position.scss" />
@@ -118,12 +118,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.30" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.30">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Radzen.Blazor" Version="4.3.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+    <PackageReference Include="Radzen.Blazor" Version="3.20.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EF\" />
   </ItemGroup>
 
 </Project>

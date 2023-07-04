@@ -1,0 +1,262 @@
+﻿@page "/capturacobro"
+@using PrestaFacil.Services;
+@inject ICobradorService cobradorService
+@inject ITipoTransaccionService tipoTransaccionService
+@inject IClienteService clienteService
+@inject IPrestamoService prestamoService
+@inject IPrestamoDetalleService prestamoDetalleService
+@inject ICobroService cobroService
+@inject NotificationService notificationService
+
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+                Captura de Cobros
+            </div>
+            <RadzenNotification Style="text-align:center !important" />
+            <div class="card-body">
+                   <RadzenNotification Style="text-align:center !important" />
+                   <EditForm Model="CobCab" OnValidSubmit="validarFormulario" class="row g-3">
+                   <DataAnnotationsValidator />
+                   <div class="row ml-3" style="width:98% !important; ">
+
+                        <div class="col-md-2">
+                            <label style="padding:0 !important;">Fecha:</label>
+                            <InputDate @bind-Value="@CobCab.Fecha" FormatString="{0:dd/MM/yyyy}" Class="w-100 form-control" />
+                            <ValidationMessage For="(()=> CobCab.Fecha)" />
+                        </div>
+                        <div class="col-md-10">
+                            <label style="padding:0 !important;">Cliente:</label>
+                            <div class="input-group">
+                            <InputText @bind-Value="@CobCab.Concepto"  Class="w-70 form-control"  />
+                                <button @onclick="aplicarPago" type="button" class="btn btn-primary">Aplicar pago </button>
+                            </div>
+                            <ValidationMessage For="(()=> CobCab.Concepto)" />
+                        </div>
+                   </div>
+                   </EditForm>
+            </div>
+        </div>
+ 
+        <div class="card mt-4">
+            <div class="card-header">Detalle de Cobros</div>
+        </div>
+        <RadzenGrid @ref="Grid" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true"
+                    Data="@lstCobroDetalle" TItem="Cobro_detalle" ColumnWidth="150px" class="table table-bordered table-striped table-hover">
+            <Columns>
+                <RadzenGridColumn TItem="Cobro_detalle" Property="PrestamoId" Title="No.Prestamo" Width="7%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cobro_detalle" Property="des_tipo_transaccion" Title="Tipo Transacción" Width="15%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cobro_detalle" Property="NoCuota" Title="No.Cuota" Width="7%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cobro_detalle" Property="Cuota" Title="Monto Cuota" FormatString="{0:N2}" Width="15%"></RadzenGridColumn>
+
+                <RadzenGridColumn TItem="Cobro_detalle" Title="Borrar" Width="10%" Property="Id">
+                    <Template Context="data">
+                            <button @onclick="@(() => borrar_cobro(data))" type="button" data-toggle="modal" data-target="#dlgBorrar" value="" class="btn btn-primary btn-sm oi oi-zoom-out" />
+                    </Template>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+
+    </div>
+    <div class="col-md-4 scro">
+        <div class="card">
+            <div class="card-header">
+                Busca Cliente
+            </div>
+        </div>
+
+        <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="3"
+                    Data="@lstClientes" TItem="Cliente" ColumnWidth="150px" class="table table-bordered table-striped table-hover">
+            <Columns>
+                <RadzenGridColumn TItem="Cliente" Property="Nombre" Title="Nombre Cliente" Width="45%" ></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cliente" Title="Seleccionar" Width="15%" Property="Id">
+                    <Template Context="data">
+                        <div style="text-align: center;">
+                            <button type="button" @onclick="@(() => seleccionaCliente(@data.Id, data.Nombre))" class="btn btn-primary btn-sm oi oi-zoom-out" />
+                        </div>
+                    </Template>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+
+        <div class="card">
+            <div class="card-header">
+                Préstamos Cliente (@nombre_cliente)
+            </div>
+        </div>
+        <RadzenGrid @ref="GridPrestamosCliente" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="3"
+                    Data="@lstPrestamoDetalle" TItem="VwClientePrestamoDetalle" ColumnWidth="150px" class="table table-bordered table-striped table-hover ">
+            <Columns>
+                <RadzenGridColumn TItem="VwClientePrestamoDetalle" Property="PrestamoId" Title="Prestamo" Width="10%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="VwClientePrestamoDetalle" Property="NoCuota" Title="No.Cuota" Width="10%" ></RadzenGridColumn>
+                <RadzenGridColumn TItem="VwClientePrestamoDetalle" Property="MontoCuota" FormatString="{0:N2}" Title="Cuota" Width="12%"></RadzenGridColumn>
+                
+                <RadzenGridColumn TItem="VwClientePrestamoDetalle" Title="Selecionar" Width="10%" Property="Id">
+                    <Template Context="data" >
+                         <div style="text-align: center;">
+                            <button @onclick="@(() => seleccionaCuota(data.PrestamoId, data.NoCuota, @nombre_cliente))" type="button" data-toggle="modal" data-target="#dlgBorrar" value="" class="btn btn-primary btn-sm oi oi-zoom-out" />
+                        </div>
+                    </Template>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+
+
+    </div>
+</div>
+
+@code {
+    public Cobro_cabecera CobCab = new Cobro_cabecera();
+
+    public List<Cobrador> lstCobrador;
+    private IEnumerable<VwPrestamosClientes> lstPrestamosCliente = new List<VwPrestamosClientes>();
+    private List<Tipo_transaccion> lstTipoTransaccion = new List<Tipo_transaccion>();
+    private List<Cliente> lstClientes = new List<Cliente>();
+    private List<Prestamo> lstPrestamos = new List<Prestamo>();
+    List<VwClientePrestamoDetalle> lstPrestamoDetalle = new List<VwClientePrestamoDetalle>();
+    private Cliente ClienteSeleccionado = new Cliente();
+    private List<Cobro_detalle> lstCobroDetalle = new List<Cobro_detalle>();
+    private string nombre_cliente = "";
+    private int contador = 1;
+    RadzenGrid<Cobro_detalle> Grid;
+    RadzenGrid<VwClientePrestamoDetalle> GridPrestamosCliente;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        CobCab.cobro_detalle = new List<Cobro_detalle>();
+        CobCab.Fecha = DateTime.Now;
+        lstCobrador =  await cobradorService.Get();
+        lstTipoTransaccion = await tipoTransaccionService.Get();
+        lstClientes = await clienteService.Get();
+        lstPrestamos = await prestamoService.Get();
+
+
+    }
+    private async void validarFormulario()
+    {
+
+    }
+
+    private async void seleccionaCliente(int Id, string pnombre)
+    {
+
+
+        CobCab.Concepto = pnombre;
+        nombre_cliente = pnombre;
+        CobCab.ClienteId = Id;
+        lstCobroDetalle = new List<Cobro_detalle>();
+        lstPrestamoDetalle = prestamoDetalleService.GetPrestamoDetalleCliente(Id).OrderBy(a=>a.PrestamoId).OrderBy(a=>a.NoCuota).ToList();
+
+
+
+
+    }
+
+    private void seleccionaCuota(int pPrestamoId, int pNoCuota, string pnombreCliente)
+    {
+        Cobro_detalle valorCuota = new Cobro_detalle();
+        valorCuota = cobroService.getcuota(pPrestamoId, pNoCuota, 2);
+
+        if(valorCuota != null)
+        {
+            notificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Información",
+                    Detail = "Cuota ya fue pagada",
+                    Duration = 4000
+                });
+        }
+        else
+        {
+
+            bool valida = false;
+            Cobro_detalle cuota = new Cobro_detalle();
+            //nombre_cliente = pnombreCliente;
+            //CobCab.Concepto = pnombreCliente;
+            var pc = prestamoDetalleService.GetPrestamoCuota(pPrestamoId, pNoCuota);
+            Tipo_transaccion tt = tipoTransaccionService.Get(2);
+            cuota.NoCuota = pNoCuota;
+            cuota.Cuota = (decimal)pc.MontoCuota;
+            cuota.PrestamoId = pc.PrestamoId;
+            cuota.des_tipo_transaccion = tt.Descripcion;
+            cuota.Tipo_transaccionId = 2;
+            try
+            {
+                Cobro_detalle cd = new Cobro_detalle();
+                cd = lstCobroDetalle.Where(x => x.PrestamoId == cuota.PrestamoId && x.NoCuota == cuota.NoCuota).FirstOrDefault();
+
+                if (cd == null)
+                {
+                    lstCobroDetalle.Add(cuota);
+                }
+
+
+                CobCab.cobro_detalle = lstCobroDetalle;
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            Grid.Reload();
+        }
+    }
+
+    private void borrar_cobro(Cobro_detalle cd)
+    {
+        lstCobroDetalle.Remove(cd);
+        Grid.Reload();
+    }
+
+    private async  void aplicarPago()
+    {
+
+        if (CobCab.ClienteId == 0)
+        {
+            notificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Información",
+                    Detail = "Primero debe seleccionar el cliente",
+                    Duration = 4000
+                });
+        }
+        else if (lstCobroDetalle.Count == 0)
+        {
+            notificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Información",
+                    Detail = "No hay detalle de pagos, verifique",
+                    Duration = 4000
+                });
+        }
+        else
+        {
+            CobCab.Feccre = DateTime.Now;
+            CobCab.Fecmod = DateTime.Now;
+            var cob =  cobroService.Add(CobCab);
+            CobCab = new Cobro_cabecera();
+            lstCobroDetalle = new List<Cobro_detalle>();
+            lstPrestamoDetalle = prestamoDetalleService.GetPrestamoDetalleCliente(CobCab.ClienteId).OrderBy(a=>a.PrestamoId).OrderBy(a=>a.NoCuota).ToList();
+            GridPrestamosCliente.Reload();
+            
+            notificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Información",
+                    Detail = "Pago aplicado correctamente",
+                    Duration = 4000
+                });
+            
+            OnInitializedAsync();
+        }        
+
+    }
+
+
+
+}

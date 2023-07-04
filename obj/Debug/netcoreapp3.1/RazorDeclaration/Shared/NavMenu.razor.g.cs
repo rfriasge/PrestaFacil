@@ -27,13 +27,6 @@ using Microsoft.AspNetCore.Authorization;
 #line hidden
 #nullable disable
 #nullable restore
-#line 3 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
-using Microsoft.AspNetCore.Components.Authorization;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
 #line 4 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -77,14 +70,35 @@ using PrestaFacil.Shared;
 #nullable disable
 #nullable restore
 #line 10 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
-using Radzen;
+using PrestaFacil.Models;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 11 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
+using PrestaFacil.Helpers;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 12 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
+using Radzen;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
 using Radzen.Blazor;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 14 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
+using Microsoft.AspNetCore.Components.Authorization;
 
 #line default
 #line hidden
@@ -97,9 +111,12 @@ using Radzen.Blazor;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 33 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\Shared\NavMenu.razor"
+#line 97 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\Shared\NavMenu.razor"
        
     private bool collapseNavMenu = true;
+    private bool expandSubMenu1;
+    private bool expandSubMenu2;
+    private bool expandSubMenu3;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

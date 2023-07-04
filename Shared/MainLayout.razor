@@ -3,12 +3,30 @@
 <div class="sidebar">
     <NavMenu />
 </div>
-
+<RadzenNotification />
 <div class="main">
-    <div class="top-row px-4">
-        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-    </div>
+ @*         <div class="container-fluid pl-0 pr-0 " style="height:60px !important; background:#f7f7f7 !important">
+            <div class="d-flex flex-row w-100 justify-content-between">*@
+    <div class="row" style="height:57px !important; background:#661FA5 !important; padding-top:4px;">
+                    <div class="col-10">
+                        <p style="font-size:30px; color:white; vertical-align:middle">Cooperativa de Préstamos para Pime</p>
+                    </div>
+                    <div class="col-2" >
+                                 <p style="color:white !important; margin-top:12px !important;">Usuario : rfrias</p>
+                    </div>
+                </div>
+                @*<div class="form-inline">
+                    <div >
+                        <p style="font-size:40px; color:blue; vertical-align:middle">Sistema de Préstamos</p>
+                    </div>
 
+                    <div style="padding-right:0px !important; margin-right:0 !important">
+                            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                    </div>
+                </div>*@
+      @*      </div>
+        </div>
+*@
     <div class="content px-4">
         @Body
     </div>

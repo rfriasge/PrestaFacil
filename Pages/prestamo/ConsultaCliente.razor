@@ -1,0 +1,33 @@
+﻿@if(lstCliente.Count == 0)
+{
+    <p>No existen clientes</p>
+}else
+{
+    <div class="form-group mt-1" style="width:50% !important">
+
+        <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                AllowSorting="true" Data="@lstCliente" TItem="Cliente" ColumnWidth="150px" class="table table-bordered table-striped table-hover ">
+            <Columns>
+                <RadzenGridColumn TItem="Cliente" Property="Nombre" Title="Nombre" Width="53%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cliente" Property="Rnc_cedula" Title="Rnc / Cédula" Width="13%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cliente" Property="Telefono1" Title="Telefono 1" Width="13%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cliente" Property="Telefono2" Title="Telefono 2" Width="13%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cliente" Title="Acción" Width="6.8%" Property="Id">
+                    <Template Context="data">
+                        <button type="button" data-toggle="modal" data-target="#dlgCliente" value="Ed" class="btn btn-primary btn-sm oi oi-pencil" @onclick="@(() => seleccionaCliente(@data))" />
+                    </Template>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+
+    </div>
+}
+@code {
+    [Parameter] public Cliente cliente { get; set; }
+    List<Cliente> lstCliente = new List<Cliente>();
+
+    private void seleccionaCliente(Cliente cliente)
+    {
+        
+    }
+}

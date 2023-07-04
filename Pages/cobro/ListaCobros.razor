@@ -1,0 +1,79 @@
+﻿@page "/cobros"
+@inject IJSRuntime JS
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using PrestaFacil.Services;
+@inject ICobroService cobroService
+
+
+
+<div class="container-fluid h-100 pl-0 pr-0 ">
+    <div class="d-flex flex-row w-100 justify-content-between">
+        <div class="form-inline ">
+            <h3>Cobros</h3>
+        </div>
+
+        <div style="padding-right:0px !important; margin-right:7px !important; ">
+            <a type="button" href="/capturacobro" class="btn btn-primary"  >
+                <span class="oi oi-plus" aria-hidden="true"></span>
+                Captura Cobros
+            </a>
+        </div>
+    </div>
+</div>
+@if (lstCobros == null)
+{
+    <p>No existen registros</p>    
+}
+else{
+<div class="form-group mt-1">
+        
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                AllowSorting="true" Data="@lstCobros" TItem="Cobro_cabecera" ColumnWidth="150px" class="table table-bordered table-striped table-hover ">
+        <Columns>
+                <RadzenGridColumn TItem="Cobro_cabecera" Property="Fecha" Title="Fecha" Width="10%" FormatString="{0:dd/MM/yyyy}"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cobro_cabecera" Property="Concepto" Title="Concepto" Width="40%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Cobro_cabecera" Title="Acción" Width="6.8%" Property="Id">
+                    <Template Context="data">
+                        <button type="button" data-toggle="modal" data-target="#dlgCliente" value="Ed" class="btn btn-primary btn-sm oi oi-pencil" @onclick="@(() => prepararEdit(@data))" />
+                       @* <button type="button" data-toggle="modal" data-target="#dlgBorrar" value="" class="btn btn-primary btn-sm oi oi-trash"      @onclick="@(() => prepararDelete(@data.Id))" />*@
+                    </Template>
+                </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+    
+ 
+</div>
+}
+@*<FormularioCliente Id="Id" cliente="cliente" TituloPantalla="TituloPantalla" DataChanged="@DataChanged"></FormularioCliente>
+<BorraCliente CiaId="Id" cliente="cliente" DataChanged="@DataChanged"></BorraCliente>*@
+
+@code {
+    public List<Cobro_cabecera> lstCobros;
+    public Cobro_cabecera cobro_cabecera = new Cobro_cabecera();
+    public string TituloPantalla = "";
+    private int Id = 0;
+    NavigationManager navigationManager;
+    protected override async Task OnInitializedAsync()
+    {
+        lstCobros = await cobroService.Get();
+    }
+
+
+
+    private void prepararEdit(Cobro_cabecera cc)
+    {
+        cobro_cabecera = cc;
+    }
+
+
+    private void prepararDelete(int id)
+    {
+        Id = id;
+    }
+
+    private async void DataChanged()
+    {
+        lstCobros = await cobroService.Get();
+    }
+
+}

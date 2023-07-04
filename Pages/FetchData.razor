@@ -1,5 +1,5 @@
 ﻿@page "/fetchdata"
-
+@inject IJSRuntime JS
 @using PrestaFacil.Data
 @inject WeatherForecastService ForecastService
 
@@ -14,17 +14,8 @@
 else
 {
 
-    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-            FilterMode="FilterMode.Advanced" AllowPaging="true" PageSize="4" AllowSorting='true' Data="@forecasts"
-            TItem="WeatherForecast" ColumnWidth="200px">
-            <Columns>
-            <RadzenGridColumn TItem="WeatherForecast" Property="Date" Title="Date" />
-            <RadzenGridColumn TItem="WeatherForecast" Property="TemperatureC" Title="TemperatureC" />
-            <RadzenGridColumn TItem="WeatherForecast" Property="TemperatureF" Title="TemperatureF" />
-            <RadzenGridColumn TItem="WeatherForecast" Property="Summary" Title="Summary" />
-            </Columns>
-    </RadzenGrid>
-    @*<table class="table">
+
+    <table class="table" id="myTable">
         <thead>
             <tr>
                 <th>Date</th>
@@ -44,14 +35,23 @@ else
                 </tr>
             }
         </tbody>
-    </table>*@
+    </table>
 }
 
 @code {
     private WeatherForecast[] forecasts;
-    
+
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JS.InvokeVoidAsync("InitTable");
+        }
+        return base.OnAfterRenderAsync(firstRender);
     }
 }

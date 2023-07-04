@@ -11,6 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Radzen;
+using Microsoft.AspNetCore.Components.Authorization;
+using PrestaFacil.Auth;
+//using Microsoft.Extensions.Options;
+
 
 namespace PrestaFacil
 {
@@ -27,12 +32,36 @@ namespace PrestaFacil
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(
-               options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddSignalRCore();
+
+            // En caso de que desees utilizar Azure SignalR
+            //services.AddSignalRCore().AddAzureSignalR(Configuration.GetConnectionString("SignalR"));
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DbPrestamos")),
+                    ServiceLifetime.Transient);
+
+            //services.AddDbContext<ApplicationDbContext>(
+            //   options => options.UseSqlServer(Configuration.GetConnectionString("DbPrestamos")));
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddTransient<IToDoListService, ToDoListService>();
+            services.AddTransient<ICompaniaService, CompaniaService>();
+            services.AddTransient<IClienteService, ClienteService>();
+            services.AddTransient<ITipoClienteService, TipoClienteService>();
+            services.AddTransient<IAmortizacion, AmortizacionService>();
+            services.AddTransient<IPrestamoService, PrestamoService>();
+            services.AddTransient<IPrestamoDetalleService, PrestamoDetalleService>();
+            services.AddTransient<ICobroService, CobroService>();
+            services.AddTransient<ICobradorService, CobradorService>();
+            services.AddTransient<ITipoTransaccionService, TipoTransaccionService>();
+            services.AddScoped<NotificationService>();
+            services.AddAuthenticationCore();
+            services.AddScoped<AuthenticationStateProvider, ProveedorAutenticacionPrueba>();
+            
+
 
         }
 

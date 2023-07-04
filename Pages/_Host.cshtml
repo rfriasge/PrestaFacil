@@ -12,11 +12,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PrestaFacil</title>
     <base href="~/" />
-    <script src="~/lib/jquery/jquery.js"></script>
-    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <link href="~/lib/datatable/datatables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/lib/datatable/datatables.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css">
+
 </head>
 <body>
     <app>
@@ -34,8 +36,14 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <script src="_framework/blazor.server.js"></script>
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+     <script src="~/lib/datatable/jquery.datatables.js"></script>
+    <script src="~/lib/datatable/datatables.min.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_framework/blazor.server.js"></script>
+    <script src="scripts/site.js"></script>
+
     <script>
         function ShowModal(modalId) {
             $('#' + modalId).modal('show');

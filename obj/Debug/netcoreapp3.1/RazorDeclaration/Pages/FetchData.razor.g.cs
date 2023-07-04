@@ -27,13 +27,6 @@ using Microsoft.AspNetCore.Authorization;
 #line hidden
 #nullable disable
 #nullable restore
-#line 3 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
-using Microsoft.AspNetCore.Components.Authorization;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
 #line 4 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -77,14 +70,35 @@ using PrestaFacil.Shared;
 #nullable disable
 #nullable restore
 #line 10 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
-using Radzen;
+using PrestaFacil.Models;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
 #line 11 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
+using PrestaFacil.Helpers;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 12 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
+using Radzen;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
 using Radzen.Blazor;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 14 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\_Imports.razor"
+using Microsoft.AspNetCore.Components.Authorization;
 
 #line default
 #line hidden
@@ -105,19 +119,29 @@ using PrestaFacil.Data;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 50 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\Pages\FetchData.razor"
+#line 41 "D:\desarrollo\app_blazor\PrestaFacil\PrestaFacil\Pages\FetchData.razor"
        
     private WeatherForecast[] forecasts;
-    
+
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JS.InvokeVoidAsync("InitTable");
+        }
+        return base.OnAfterRenderAsync(firstRender);
     }
 
 #line default
 #line hidden
 #nullable disable
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private WeatherForecastService ForecastService { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JS { get; set; }
     }
 }
 #pragma warning restore 1591

@@ -1,0 +1,158 @@
+﻿@using PrestaFacil.Services;
+@inject IClienteService clienteService
+@inject ITipoClienteService tipoClienteService
+@inject IJSRuntime jsRuntime
+@inject NavigationManager navigationManager
+
+<!-- Modal -->
+<div class="modal fade" id="dlgCliente" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+     style="margin-left:9% !important;">
+    <div class="modal-dialog"  role="document" style="width:50% !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@titulo_pantalla</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+
+                <EditForm Model="cliente" OnValidSubmit="HandleValidSubmit" class="row g-3">
+                        <DataAnnotationsValidator />
+                        <div class="col-md-6 ">
+                            <label style="padding:0 !important;">Nombre Cliente:</label>
+                        <InputText class="form-control" @bind-Value="@cliente.Nombre" />
+                        <ValidationMessage For="(()=> cliente.Nombre)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Rnc / Cédula:</label>
+                        <InputText class="form-control" @bind-Value="@cliente.Rnc_cedula" />
+                        <ValidationMessage For="(()=> cliente.Rnc_cedula)" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Email:</label>
+                        <InputText class="form-control" @bind-Value="@cliente.Email" />
+                        <ValidationMessage For="(()=> cliente.Email)" />
+                        </div>
+
+                        <div class="col-md-9 mt-2">
+                            <label>Dirección:</label>
+                            <InputTextArea class="form-control" @bind-Value="@cliente.Direccion" />
+                            <ValidationMessage For="(()=> cliente.Direccion)" />
+                        </div>
+                        <div class="col-md-3 mt-2">
+
+                                <div class="mt-2">
+                                 <RadzenLabel>Tipo Cliente</RadzenLabel>
+                                 <RadzenDropDown class="form-control"
+                                     TValue="int" 
+                                     @bind-Value="cliente.Tipo_clienteId"  
+                                     Placeholder="Tipo Cliente" 
+                                     Data="@lstTipoCliente" 
+                                     TextProperty="Descripcion"
+                                     ValueProperty="Id" 
+                                     />
+                                </div>
+
+                        </div>
+
+                       <div class="col-md-3 mt-2">
+                            <label>Teléfono 1:</label>
+                            <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" class="form-control" @bind-Value="@cliente.Telefono1" />
+                            <ValidationMessage For="(()=> cliente.Telefono1)" />
+                        </div>
+                        <div class="col-md-3 mt-2">
+                            <label>Teléfono 2:</label>
+                            <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" class="form-control" @bind-Value="@cliente.Telefono2" />
+                            <ValidationMessage For="(()=> cliente.Telefono2)" />
+                        </div>
+                        <div class="col-md-3 mt-2">
+                            <label>Contacto:</label>
+                            <InputText class="form-control" @bind-Value="@cliente.Contacto" />
+                            <ValidationMessage For="(()=> cliente.Contacto)" />
+                        </div>
+                        <div class="col-md-3 mt-2">
+                            <label>Tel Contacto:</label>
+                            <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" Name="Phone" class="form-control" @bind-Value="@cliente.Telefono_contacto" />
+                            <ValidationMessage For="(()=> cliente.Telefono_contacto)" />
+                        </div>
+
+                    
+                    <hr/>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Grabar</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@CloseTaskModal">Close</button>
+                        </div>
+                   </EditForm>
+                
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] public int Id { get; set; }
+
+    [Parameter] 
+    public Cliente cliente { get; set; }
+    private string titulo_pantalla { get; set; }
+
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public string TituloPantalla { get; set; }
+    [Parameter] public Action DataChanged { get; set; }
+    public List<Tipo_Cliente> lstTipoCliente = new List<Tipo_Cliente>();
+     
+    protected override async Task OnInitializedAsync()
+    {
+        lstTipoCliente  = await tipoClienteService.GetTiposClientes();
+
+        if(cliente.Id == 0)
+        {
+
+            cliente = new Cliente();
+            cliente.Tipo_clienteId = 0;
+            titulo_pantalla = "Crear Cliente";
+        }
+        else
+        {
+            titulo_pantalla = "Editar Cliente";
+        }
+    }
+    private async void HandleValidSubmit()
+    {
+        if (cliente.Id == 0)
+        {
+            cliente.Feccre = DateTime.Now;
+            cliente.Fecmod = DateTime.Now;
+            if(cliente.Tipo_clienteId == 0)
+            {
+                cliente.Tipo_clienteId = 1;
+            }
+            await clienteService.Add(cliente);
+        }
+        else
+        {
+            cliente.Fecmod = DateTime.Now;
+            cliente.Usrmod = "sa";
+            await clienteService.Update(cliente);
+        }
+        await CloseTaskModal();
+        navigationManager.NavigateTo("/clientes",true);
+        //DataChanged?.Invoke();
+    }
+    private async Task CloseTaskModal()
+    {
+        navigationManager.NavigateTo("/clientes",true);
+        await jsRuntime.InvokeAsync<object>("CloseModal", "dlgCliente");
+        DataChanged?.Invoke();
+    }
+
+
+
+}

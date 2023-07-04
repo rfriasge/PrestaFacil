@@ -1,0 +1,101 @@
+﻿@page "/companias"
+@inject IJSRuntime JS
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using PrestaFacil.Services;
+@inject ICompaniaService companiaServicio
+
+
+
+<div class="container-fluid h-100 pl-0 pr-0 ">
+    <div class="d-flex flex-row w-100 justify-content-between">
+        <div class="form-inline ">
+            <h3>Compañias</h3>
+        </div>
+
+        <div style="padding-right:0px !important; margin-right:7px !important; ">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#dlgCompania" >
+                <span class="oi oi-plus" aria-hidden="true"></span>
+                Crear Compañia
+            </button>
+        </div>
+    </div>
+</div>
+@if (lstCompania == null)
+{
+    <p>No existen registros</p>    
+} 
+else{
+<div class="form-group mt-1">
+        
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                AllowSorting="true" Data="@lstCompania" TItem="Compania" ColumnWidth="150px" class="table table-bordered table-striped table-hover rz-has-paginator rz-datatable  rz-datatable-scrollable rz-datatable-reflow">
+        <Columns>
+                <RadzenGridColumn TItem="Compania" Property="Nombre" Title="Nombre" Width="53%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Compania" Property="Rnc" Title="RNC" Width="13%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Compania" Property="Telefono1" Title="Telefono 1" Width="13%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Compania" Property="Telefono2" Title="Telefono 2" Width="13%"></RadzenGridColumn>
+                <RadzenGridColumn TItem="Compania" Title="Acción" Width="6.8%" Property="Id">
+                    <Template Context="data">
+                        <button type="button" data-toggle="modal" data-target="#dlgCompania" value="Ed" class="btn btn-primary btn-sm oi oi-pencil" @onclick="@(() => prepararEdit(@data))" />
+                        <button type="button" data-toggle="modal" data-target="#dlgBorrar" value="" class="btn btn-primary btn-sm oi oi-trash"      @onclick="@(() => prepararDelete(@data.Id))" />
+                    </Template>
+                </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+    
+ 
+</div>
+}
+<FormularioCompania Id="Id" compania="compania" TituloPantalla="TituloPantalla" DataChanged="@DataChanged"></FormularioCompania>
+<BorraCompania CiaId="Id" compania="compania" DataChanged="@DataChanged"></BorraCompania>
+
+@code {
+    public bool MostrarModal = true;
+    public List<Compania> lstCompania;
+    public Compania compania = new Compania();
+    public string TituloPantalla = "";
+    private int Id = 0;
+    NavigationManager navigationManager;
+    protected override async Task OnInitializedAsync()
+    {
+
+        lstCompania = await companiaServicio.Get();
+
+
+    }
+
+    //private void crear()
+    //{
+    //    MostrarModal = true;
+
+    //}
+    //protected override Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    //var esta_inicializada = JS.InvokeVoidAsync("esta_inicializada");
+    //    //JS.InvokeVoidAsync("InitTable");
+
+    //    return base.OnAfterRenderAsync(firstRender);
+    //}
+
+    private void prepararEdit(Compania cia)
+    {
+        compania = cia;
+
+    }
+
+
+    private void prepararDelete(int id)
+    {
+        Id = id;
+    }
+
+    private async void DataChanged()
+    {
+        
+        lstCompania = await companiaServicio.Get();
+        //await JS.InvokeVoidAsync("reload");
+        //lstCompania = await companiaServicio.Get();
+       // StateHasChanged();
+    }
+
+}

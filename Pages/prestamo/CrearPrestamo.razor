@@ -1,0 +1,195 @@
+﻿@using PrestaFacil.Services;
+@inject IClienteService clienteServicio
+@inject IAmortizacion amortizacionService
+@inject IPrestamoService prestamoService
+@inject IPrestamoDetalleService prestamoDetalleService
+@inject NavigationManager navigationManager
+@inject NotificationService notificationService
+@inject IJSRuntime jsRuntime
+
+
+
+<div class="modal fade" id="dlgCrearPrestamo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+     style="margin-left:9% !important;">
+    <div class="modal-dialog"  role="document" style="width:100% !important; min-height:400px !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Crea Préstamo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <RadzenNotification Style="text-align:center !important" />
+            <div class="modal-body">
+
+                <EditForm Model="CalPrev" OnValidSubmit="validarFormulario" class="row g-3">
+                    <DataAnnotationsValidator />
+                    <div class="row ml-3" style="width:98% !important; ">
+
+                            <div class="col-md-2">
+                                <label style="padding:0 !important;">Monto Préstamo:</label>
+                                <RadzenNumeric TValue="double" name="montoPrestamo" title="Prestamo" Format="c" @bind-Value=@CalPrev.MontoPrestamo />
+                                <ValidationMessage For="(()=> CalPrev.MontoPrestamo)" />
+                            </div>
+
+                            <div class="col-md-1">
+                                <label style="padding:0 !important;">Cuotas:</label>
+                                <RadzenNumeric TValue="int" name="cantidadmeses" title="Prestamo" @bind-Value=@CalPrev.CantidadMeses />
+                                <ValidationMessage For="(()=> CalPrev.CantidadMeses)" />
+                            </div>
+
+                            <div class="col-md-1">
+                                <label style="padding:0 !important; margin-left:0px !important; margin-right:0px !important;">Tasa:</label> <br />
+                                <RadzenNumeric TValue="double" name="tasa" title="Prestamo" Style="margin-left:0px !important;"  @bind-Value=@CalPrev.Tasa />
+                                <ValidationMessage For="(()=> CalPrev.Tasa)" />
+                            </div>
+                            <div class="col-md-2">
+                                <label style="padding:0 !important;">Monto Cuota:</label> <br />
+                            <RadzenNumeric TValue="double" title="Prestamo" @bind-Value=@CalPrev.MontoCuota Format="c" />
+                                <ValidationMessage For="(()=> CalPrev.MontoCuota)" />
+                            </div>
+                            <div class="col-md-4 ">
+                                <label style="padding:0 !important;">Nombre Cliente:</label>
+                                <InputText class="form-control" @bind-Value="@CalPrev.NombreCliente" @onchange="cambiar" />
+                                <ValidationMessage For="(()=> CalPrev.NombreCliente)" />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary" style="margin-top:33px !important;">Crear Préstamo</button>
+                            </div>
+                    </div>
+                </EditForm>
+            
+                @if (lstCliente == null)
+                {
+                    <p>No existen registros</p>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                        <div class="form-group mt-5">
+                            <div class="card">
+                                <div class="card-header">Seleccionar Cliente para Préstamo</div>
+                            </div>
+                            <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                                    Data="@lstCliente" TItem="Cliente" ColumnWidth="150px" class="table table-bordered table-striped table-hover ">
+                                <Columns>
+                                    <RadzenGridColumn TItem="Cliente" Property="Nombre" Title="Nombre Cliente" Width="30%"></RadzenGridColumn>
+                                    <RadzenGridColumn TItem="Cliente" Property="Rnc_cedula" Title="Rnc / Cédula" Width="15%"></RadzenGridColumn>
+                                    <RadzenGridColumn TItem="Cliente" Title="Acción" Width="10%" Property="Id">
+                                        <Template Context="data">
+                                            <button type="button" data-toggle="modal" data-target="#dlgBorrar" value="" class="btn btn-primary btn-sm oi oi-zoom-out" @onclick="@(() => seleccioneCliente(@data))" />
+                                        </Template>
+                                    </RadzenGridColumn>
+                                </Columns>
+                            </RadzenGrid>
+                        </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mt-5">
+                                <div class="card">
+                                    <div class="card-header">Histórico de Préstamos del Cliente ( @CalPrev.NombreCliente )</div>
+                                </div>
+                                <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
+                                         Data="@lstPrestamosCliente" TItem="VwPrestamosClientes" ColumnWidth="150px" class="table table-bordered table-striped table-hover ">
+                                    <Columns>
+                                        <RadzenGridColumn TItem="VwPrestamosClientes" Property="Feccre" Title="Fecha" FormatString="{0:dd/MM/yyyy}" Width="12%"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="VwPrestamosClientes" Property="Monto_prestamo" Title="Monto Préstamo" FormatString="{0:N2}" Width="14%"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="VwPrestamosClientes" Property="tasa" Title="Tasa" Width="10%"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="VwPrestamosClientes" Property="Cantidad_cuota" Title="No.Cuotas" Width="10%"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="VwPrestamosClientes" Property="estado" Title="Estado" Width="10%"></RadzenGridColumn>
+                                    </Columns>
+                                </RadzenGrid>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+<ConfirmaCreaPrestamo CrearPrestamo="@creaPrestamo" nombre_cliente="@CalPrev.NombreCliente" />
+
+@code {
+    [Parameter] public CalculoPrestamoPrev CalPrev { get; set; }
+    [Parameter] public double Cuota {get; set;}
+    [Parameter] public List<TablaAmortizacion> lstAmortizacion { get; set; }
+    [Parameter] public List<Cliente> lstCliente { get; set; }
+    private IEnumerable<VwPrestamosClientes> lstPrestamosCliente = new List<VwPrestamosClientes>();
+    private Cliente cliente = new Cliente();
+    string titulo_pantalla = "";
+    string vNombreCliente = "";
+
+    private async void validarFormulario()
+    {
+        await jsRuntime.InvokeAsync<object>("ShowModal", "dlgConfirmacion");
+    }
+    private void cambiar()
+    {
+        if (CalPrev.NombreCliente.Length == 0)
+        {
+            CalPrev.ClienteId = 0;
+        }
+    }
+    private void seleccioneCliente(Cliente pcliente)
+    {
+        CalPrev.NombreCliente = pcliente.Nombre;
+        CalPrev.ClienteId = pcliente.Id;
+        lstPrestamosCliente = prestamoService.lstPrestamosClientes(pcliente.Id).ToList();
+        vNombreCliente = CalPrev.NombreCliente;
+    }
+
+    private void creaPrestamo()
+    {
+        Prestamo pre = new Prestamo();
+        pre.Monto_prestamo = (decimal)CalPrev.MontoPrestamo;
+        pre.Cantidad_cuota = CalPrev.CantidadMeses;
+        pre.Tasa = (decimal)CalPrev.Tasa;
+        pre.ClienteId = CalPrev.ClienteId;
+        pre.Usrcre = "sa";
+        pre.Tipo_prestamoId = 1;
+        //pre.Feccre = DateTime.Parse(DateTime.Now.ToString("MM/dd/yyyy"));
+        //pre.fecMod = DateTime.Parse(DateTime.Now.ToString("MM/dd/yyyy"));
+        pre.Feccre = DateTime.Now;
+        pre.fecMod = DateTime.Now;
+        pre.Prestamo_Detalles = new List<Prestamo_Detalle>();
+
+        foreach(TablaAmortizacion ta in lstAmortizacion)
+        {
+            Prestamo_Detalle predet = new Prestamo_Detalle();
+            predet.PrestamoId = pre.Id;
+            predet.MontoCuota = (decimal)ta.MontoCuota;
+            predet.InteresCuota = (decimal)ta.InteresCuota;
+            predet.CapitalCuota = (decimal)ta.CapitalCuota;
+            predet.NoCuota = ta.NoCuota;
+            predet.CapitalAcumulado = (decimal)ta.CapitalAcumulado;
+            predet.InteresAcumulado = (decimal)ta.InteresAcumulado;
+            predet.CapitalPendiente = (decimal)ta.CapitalPendiente;
+            predet.Tipo_transaccionId = 1;
+            predet.FechaCuota = ta.FechaCuota;
+            predet.Estatus = 1;
+            pre.Prestamo_Detalles.Add(predet);
+        }
+        prestamoService.Add(pre);
+        notificationService.Notify(new NotificationMessage
+        {
+            Severity=NotificationSeverity.Success,
+            Summary="Información",
+            Detail="Prestamo creado correctamente",Duration=4000
+        });
+        CloseTaskModal();
+
+    }
+   
+    private async Task CloseTaskModal()
+    {
+        navigationManager.NavigateTo("/calculoprestamo"); 
+        await jsRuntime.InvokeAsync<object>("CloseModal", "dlgCrearPrestamo");
+        await jsRuntime.InvokeAsync<object>("CloseModal", "dlgConfirmacion");
+        //DataChanged?.Invoke();
+    }
+
+}
